@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createAnnotator, getAnnotators, getArticles, getMeta, getQueue, saveAnnotation } from "./api.js";
+import { createAnnotator, getAnnotators, getArticles, getMeta, getQueue, releaseAnnotator, saveAnnotation } from "./api.js";
 
 const GROUP_CLASS = { "긍정": "pos", "부정": "neg", "중립·기타": "neu" };
 
@@ -47,11 +47,26 @@ export default function App() {
     setAnnotator(null);
   };
 
+  const endSession = async () => {
+    if (!window.confirm(`${annotator} 세션을 종료하고 작업자 잠금을 해제할까요?`)) return;
+    try {
+      await releaseAnnotator(annotator);
+    } catch (error) {
+      alert(`${error.message}
+
+현재 브라우저의 선택은 해제하고 작업자 선택 화면으로 돌아갑니다.`);
+      clearAnnotator();
+      return;
+    }
+    clearAnnotator();
+  };
+
   return (
     <Labeling
       meta={meta}
       annotator={annotator}
       onChangeAnnotator={clearAnnotator}
+      onEndSession={endSession}
     />
   );
 }
@@ -198,7 +213,7 @@ function DataList({ onBack }) {
   );
 }
 
-function Labeling({ meta, annotator, onChangeAnnotator }) {
+function Labeling({ meta, annotator, onChangeAnnotator, onEndSession }) {
   const [items, setItems] = useState(null);
   const [progress, setProgress] = useState(null);
   const [idx, setIdx] = useState(0);
@@ -368,6 +383,7 @@ function Labeling({ meta, annotator, onChangeAnnotator }) {
           <div className="topbar-right">
             <span className="annotator-name">{annotator}</span>
             <button className="link-btn" onClick={onChangeAnnotator}>변경</button>
+            <button className="link-btn danger" onClick={onEndSession}>세션 종료</button>
           </div>
         </div>
       </header>

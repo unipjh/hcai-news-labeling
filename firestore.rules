@@ -65,7 +65,8 @@ service cloud.firestore {
         && request.resource.data.created_at == request.time
         && annotatorId.size() > 0
         && annotatorId.size() <= 40;
-      allow update, delete: if false;
+      allow update: if false;
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
     }
 
     match /articles/{articleId} {
@@ -81,7 +82,8 @@ service cloud.firestore {
         && request.resource.data.annotator_id == annotatorId
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.claimed_at == request.time;
-      allow update, delete: if false;
+      allow update: if false;
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
     }
 
     match /assignments/{assignmentId} {

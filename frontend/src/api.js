@@ -1,5 +1,6 @@
 import {
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -101,6 +102,22 @@ async function claimAnnotator(annotatorId) {
     claimed_at: serverTimestamp(),
   });
   return user;
+}
+
+
+export async function releaseAnnotator(annotatorId) {
+  try {
+    await ensureAuth();
+    await deleteDoc(doc(db, "annotatorAccess", annotatorId));
+    return { ok: true };
+  } catch (error) {
+    if (error?.code === "permission-denied") {
+      throw new Error(
+        "이 브라우저가 소유한 세션만 종료할 수 있습니다. 다른 주소/브라우저에서 만든 잠금이면 관리자 잠금 해제가 필요합니다."
+      );
+    }
+    throw asError(error, "세션을 종료하지 못했습니다.");
+  }
 }
 
 export async function getMeta() {

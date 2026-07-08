@@ -44,6 +44,16 @@ python tools/import_csv_to_firestore.py \
 `--replace`는 `annotations`, `assignments`, `articles`, `annotators`, `annotatorAccess`를 지운 뒤 다시 올린다.
 실제 라벨링 시작 후에는 사용하지 않는다.
 
+## 4. 작업자 잠금 해제
+
+다른 브라우저/주소에서 만든 작업자 잠금 때문에 접속할 수 없으면 관리자 키로 잠금을 해제한다.
+
+```bash
+python tools/unlock_annotator.py Sample --credentials ./service-account.json
+```
+
+앱 안에서 정상 종료할 때는 상단의 `세션 종료` 버튼을 사용한다.
+
 ## 4. Vercel 설정
 
 Vercel 프로젝트 Root Directory를 `frontend`로 설정한다.
