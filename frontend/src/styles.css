@@ -288,3 +288,15 @@ body {
 .annotator-error {
   margin-top: 8px; color: #dc2626; font-size: 13px; text-align: left;
 }
+.center-note {
+  flex-direction: column;
+  gap: 14px;
+  text-align: center;
+  padding: 24px;
+}
+.center-note p { margin: 0; max-width: 520px; }
+.center-action {
+  border: none; border-radius: 10px; padding: 10px 14px;
+  background: var(--accent); color: #fff; font-size: 14px; font-weight: 700;
+  cursor: pointer;
+}

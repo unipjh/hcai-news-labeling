@@ -42,20 +42,29 @@ export default function App() {
       />
     );
   }
+  const clearAnnotator = () => {
+    localStorage.removeItem("annotator_id");
+    setAnnotator(null);
+  };
+
   return (
     <Labeling
       meta={meta}
       annotator={annotator}
-      onChangeAnnotator={() => {
-        localStorage.removeItem("annotator_id");
-        setAnnotator(null);
-      }}
+      onChangeAnnotator={clearAnnotator}
     />
   );
 }
 
-function CenterNote({ text }) {
-  return <div className="center-note">{text}</div>;
+function CenterNote({ text, actionLabel = null, onAction = null }) {
+  return (
+    <div className="center-note">
+      <p>{text}</p>
+      {actionLabel && onAction && (
+        <button className="center-action" onClick={onAction}>{actionLabel}</button>
+      )}
+    </div>
+  );
 }
 
 function AnnotatorSelect({ onSelect, onShowData }) {
@@ -87,7 +96,7 @@ function AnnotatorSelect({ onSelect, onShowData }) {
     }
   };
 
-  if (error) return <CenterNote text={`명단 로드 실패: ${error}`} />;
+  if (error) return <CenterNote text={`명단 로드 실패: ${error}`} actionLabel="다시 시도" onAction={() => location.reload()} />;
   if (!annotators) return <CenterNote text="불러오는 중…" />;
   return (
     <div className="select-screen">
@@ -129,7 +138,7 @@ function DataList({ onBack }) {
   useEffect(() => {
     getArticles().then(setArticles).catch((e) => setError(e.message));
   }, []);
-  if (error) return <CenterNote text={`목록 로드 실패: ${error}`} />;
+  if (error) return <CenterNote text={`목록 로드 실패: ${error}`} actionLabel="돌아가기" onAction={onBack} />;
   if (!articles) return <CenterNote text="데이터 목록 불러오는 중…" />;
 
   const q = query.trim();
@@ -321,9 +330,21 @@ function Labeling({ meta, annotator, onChangeAnnotator }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [modal, skipReason, doSave, onSaveClick, nav, noneLabel]);
 
-  if (loadError) return <CenterNote text={`큐 로드 실패: ${loadError}`} />;
+  if (loadError) return (
+    <CenterNote
+      text={`큐 로드 실패: ${loadError}`}
+      actionLabel="작업자 선택으로 돌아가기"
+      onAction={onChangeAnnotator}
+    />
+  );
   if (!items || !progress) return <CenterNote text="큐 불러오는 중…" />;
-  if (items.length === 0) return <CenterNote text="배정된 작업이 없습니다." />;
+  if (items.length === 0) return (
+    <CenterNote
+      text="배정된 작업이 없습니다."
+      actionLabel="작업자 선택으로 돌아가기"
+      onAction={onChangeAnnotator}
+    />
+  );
 
   const finished = progress.pending === 0;
   const doneCount = progress.done + progress.skipped;
