@@ -9,6 +9,13 @@ function formatDate(iso) {
   return m ? `${m[1]}.${m[2]}.${m[3]} ${m[4]}:${m[5]}` : iso;
 }
 
+function sameLabels(a = [], b = []) {
+  if (a.length !== b.length) return false;
+  const left = [...a].sort();
+  const right = [...b].sort();
+  return left.every((label, i) => label === right[i]);
+}
+
 export default function App() {
   const [meta, setMeta] = useState(null);
   const [loadError, setLoadError] = useState(null);
@@ -220,7 +227,7 @@ function Labeling({ meta, annotator, onChangeAnnotator, onEndSession }) {
   const [drafts, setDrafts] = useState({}); // article_id → labels (미저장 편집)
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(null); // {message, retry}
-  const [modal, setModal] = useState(null); // null | "empty" | "skip"
+  const [modal, setModal] = useState(null); // null | "empty" | "skip" | "changes"
   const [skipReason, setSkipReason] = useState(meta.skip_reasons[0]);
   const [query, setQuery] = useState("");
   const [loadError, setLoadError] = useState(null);
@@ -245,6 +252,30 @@ function Labeling({ meta, annotator, onChangeAnnotator, onEndSession }) {
     return drafts[current.article_id] ?? current.saved_labels ?? [];
   }, [current, drafts]);
   const isDirty = current ? current.article_id in drafts : false;
+  const changeItems = useMemo(() => {
+    if (!items) return [];
+    return items
+      .map((item, itemIdx) => {
+        if (!(item.article_id in drafts)) return null;
+        return {
+          item,
+          itemIdx,
+          labels: drafts[item.article_id],
+          kind: item.status === "pending" ? "미저장 변경" : "저장 후 수정",
+        };
+      })
+      .filter(Boolean);
+  }, [items, drafts]);
+
+  const setCurrentDraft = useCallback((next) => {
+    if (!current) return;
+    const base = current.saved_labels ?? [];
+    setDrafts((d) => {
+      const { [current.article_id]: _, ...rest } = d;
+      if (sameLabels(next, base)) return rest;
+      return { ...rest, [current.article_id]: next };
+    });
+  }, [current]);
 
   const toggle = useCallback((label) => {
     if (!current) return;
@@ -256,8 +287,15 @@ function Labeling({ meta, annotator, onChangeAnnotator, onEndSession }) {
     } else {
       next = [...selected.filter((l) => l !== noneLabel), label];
     }
-    setDrafts((d) => ({ ...d, [current.article_id]: next }));
-  }, [current, selected, noneLabel]);
+    setCurrentDraft(next);
+  }, [current, selected, noneLabel, setCurrentDraft]);
+
+  const goToChange = useCallback((itemIdx) => {
+    setIdx(itemIdx);
+    setModal(null);
+    setSaveError(null);
+    setQuery("");
+  }, []);
 
   const doSave = useCallback(async (labels, { skip = null } = {}) => {
     if (!current || saving) return;
@@ -381,6 +419,10 @@ function Labeling({ meta, annotator, onChangeAnnotator, onEndSession }) {
             </div>
           </div>
           <div className="topbar-right">
+            <button className="changes-top-btn" disabled={changeItems.length === 0}
+              onClick={() => setModal("changes")}>
+              변경 사항 {changeItems.length}건
+            </button>
             <span className="annotator-name">{annotator}</span>
             <button className="link-btn" onClick={onChangeAnnotator}>변경</button>
             <button className="link-btn danger" onClick={onEndSession}>세션 종료</button>
@@ -479,6 +521,28 @@ function Labeling({ meta, annotator, onChangeAnnotator, onEndSession }) {
         </div>
       </footer>
 
+      {modal === "changes" && (
+        <Modal onClose={() => setModal(null)} className="changes-modal">
+          <p className="modal-title">변경 사항 {changeItems.length}건</p>
+          {changeItems.length === 0 ? (
+            <p className="modal-body">미저장 변경이나 저장 후 수정 중인 건이 없습니다.</p>
+          ) : (
+            <div className="changes-list">
+              {changeItems.map(({ item, itemIdx, labels, kind }) => (
+                <button key={item.article_id} className="change-item" onClick={() => goToChange(itemIdx)}>
+                  <span className={`change-kind ${kind === "미저장 변경" ? "unsaved" : "edited"}`}>{kind}</span>
+                  <span className="change-headline">{item.headline}</span>
+                  <span className="change-meta">{itemIdx + 1} / {items.length} · {labels.length ? labels.join(", ") : "선택 없음"}</span>
+                </button>
+              ))}
+            </div>
+          )}
+          <div className="modal-actions">
+            <button className="modal-cancel" onClick={() => setModal(null)}>닫기</button>
+          </div>
+        </Modal>
+      )}
+
       {modal === "empty" && (
         <Modal onClose={() => setModal(null)}>
           <p className="modal-title">감정 없음으로 저장할까요?</p>
@@ -514,10 +578,10 @@ function Labeling({ meta, annotator, onChangeAnnotator, onEndSession }) {
   );
 }
 
-function Modal({ children, onClose }) {
+function Modal({ children, onClose, className = "" }) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>{children}</div>
+      <div className={`modal ${className}`} onClick={(e) => e.stopPropagation()}>{children}</div>
     </div>
   );
 }
