@@ -1,0 +1,316 @@
+<title>라벨링 플랫폼 와이어프레임</title>
+<style>
+:root {
+  --bg:#fafbfc; --panel:#fff; --ink:#26303e; --sub:#6b7686;
+  --line:#d7dde6; --wire:#aab4c2; --wire-bg:#f2f5f8;
+  --accent:#1d4ed8; --accent-bg:#e8eefc;
+  --pos:#3b6fd4; --neg:#c4514a; --neu:#7c8797;
+}
+@media (prefers-color-scheme: dark) { :root {
+  --bg:#12161d; --panel:#1a2029; --ink:#e6eaf1; --sub:#94a0b0;
+  --line:#2b3441; --wire:#4d5a6b; --wire-bg:#212936;
+  --accent:#7da4f5; --accent-bg:#1f2c4a;
+  --pos:#7da4f5; --neg:#e08b85; --neu:#8b97a8;
+}}
+:root[data-theme="dark"] {
+  --bg:#12161d; --panel:#1a2029; --ink:#e6eaf1; --sub:#94a0b0;
+  --line:#2b3441; --wire:#4d5a6b; --wire-bg:#212936;
+  --accent:#7da4f5; --accent-bg:#1f2c4a;
+  --pos:#7da4f5; --neg:#e08b85; --neu:#8b97a8;
+}
+:root[data-theme="light"] {
+  --bg:#fafbfc; --panel:#fff; --ink:#26303e; --sub:#6b7686;
+  --line:#d7dde6; --wire:#aab4c2; --wire-bg:#f2f5f8;
+  --accent:#1d4ed8; --accent-bg:#e8eefc;
+  --pos:#3b6fd4; --neg:#c4514a; --neu:#7c8797;
+}
+* { box-sizing:border-box; }
+body {
+  background:var(--bg); color:var(--ink); margin:0;
+  font-family:-apple-system,"Apple SD Gothic Neo",Pretendard,"Noto Sans KR","Malgun Gothic",sans-serif;
+  line-height:1.55; padding:52px 20px 90px;
+  word-break:keep-all; overflow-wrap:break-word;
+}
+main { max-width:920px; margin:0 auto; }
+.eyebrow { font-size:12px; font-weight:700; letter-spacing:.15em; color:var(--accent); text-transform:uppercase; margin:0 0 10px; }
+h1 { font-size:26px; font-weight:750; letter-spacing:-.01em; text-wrap:balance; margin:0 0 10px; }
+.lede { color:var(--sub); font-size:14.5px; max-width:66ch; margin:0 0 8px; }
+.lede b { color:var(--ink); }
+h2 { font-size:13px; font-weight:700; letter-spacing:.12em; color:var(--sub); text-transform:uppercase;
+     margin:52px 0 6px; }
+.h2-sub { font-size:13.5px; color:var(--sub); margin:0 0 18px; max-width:70ch; }
+.h2-sub b { color:var(--ink); }
+
+/* ── 플로우 다이어그램 ── */
+.flow { display:flex; flex-wrap:wrap; align-items:stretch; gap:6px; }
+.step {
+  background:var(--panel); border:1.5px solid var(--line); border-radius:10px;
+  padding:10px 13px; min-width:118px; flex:1;
+}
+.step.hot { border-color:var(--accent); background:var(--accent-bg); }
+.step-no { font-size:10.5px; font-weight:800; color:var(--accent); letter-spacing:.08em; }
+.step-t { font-size:13.5px; font-weight:700; margin-top:1px; }
+.step-d { font-size:11.5px; color:var(--sub); margin-top:2px; line-height:1.45; }
+.arrow { align-self:center; color:var(--wire); font-size:15px; padding:0 1px; }
+.loopback {
+  margin-top:8px; font-size:12px; color:var(--sub);
+  border:1.5px dashed var(--wire); border-radius:10px; padding:8px 13px;
+  display:flex; gap:8px; flex-wrap:wrap;
+}
+.loopback b { color:var(--ink); }
+.branches { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:8px; }
+.branch {
+  border:1.5px dashed var(--wire); border-radius:10px; padding:9px 12px;
+  font-size:12px; color:var(--sub); background:transparent;
+}
+.branch b { display:block; color:var(--ink); font-size:12.5px; margin-bottom:1px; }
+
+/* ── 와이어프레임 공통 ── */
+.duo { display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start; }
+.solo { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:24px; align-items:start; }
+.wf {
+  background:var(--panel); border:1.5px solid var(--wire); border-radius:12px;
+  overflow:hidden; box-shadow:0 1px 3px rgba(20,30,50,.05);
+}
+.wf-head {
+  border-bottom:1.5px solid var(--wire); padding:7px 12px; display:flex; gap:5px; align-items:center;
+  background:var(--wire-bg);
+}
+.wf-head i { width:8px; height:8px; border-radius:50%; border:1.5px solid var(--wire); display:inline-block; }
+.wf-head span { font-size:11px; color:var(--sub); margin-left:6px; letter-spacing:.02em; }
+.wf-body { padding:14px; display:flex; flex-direction:column; gap:10px; }
+.wbox { border:1.5px solid var(--wire); border-radius:8px; background:var(--panel); position:relative; }
+.wbox.ghost { border-style:dashed; background:transparent; }
+.wlabel { font-size:11px; color:var(--sub); padding:0 2px; }
+.wline { height:9px; border-radius:5px; background:var(--wire-bg); border:1px solid var(--line); }
+.wline.w40 { width:40%; } .wline.w60 { width:60%; } .wline.w80 { width:80%; }
+.wbtn {
+  border:1.5px solid var(--wire); border-radius:8px; padding:8px 10px; text-align:center;
+  font-size:12.5px; font-weight:600; color:var(--sub); background:var(--wire-bg);
+}
+.wbtn.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+.wchips { display:flex; flex-wrap:wrap; gap:5px; }
+.wchip {
+  border:1.2px solid var(--wire); border-radius:999px; padding:2.5px 9px;
+  font-size:10.5px; color:var(--sub); background:var(--panel); white-space:nowrap;
+}
+.wchip.sel { background:var(--ink); border-color:var(--ink); color:var(--bg); font-weight:700; }
+.wchip.more { border-style:dashed; }
+.g-pos .wchip:not(.sel) { border-color:color-mix(in srgb, var(--pos) 45%, transparent); color:var(--pos); }
+.g-neg .wchip:not(.sel) { border-color:color-mix(in srgb, var(--neg) 45%, transparent); color:var(--neg); }
+.g-neu .wchip:not(.sel) { border-color:color-mix(in srgb, var(--neu) 55%, transparent); color:var(--neu); }
+.gtitle { font-size:11px; font-weight:700; margin:2px 0 4px; display:flex; align-items:center; gap:5px; }
+.gdot { width:7px; height:7px; border-radius:50%; }
+.g-pos .gdot { background:var(--pos); } .g-pos .gtitle { color:var(--pos); }
+.g-neg .gdot { background:var(--neg); } .g-neg .gtitle { color:var(--neg); }
+.g-neu .gdot { background:var(--neu); } .g-neu .gtitle { color:var(--neu); }
+.wbar { display:flex; gap:7px; align-items:center; }
+.wprog { flex:1; height:6px; border-radius:4px; background:var(--wire-bg); border:1px solid var(--line); overflow:hidden; }
+.wprog i { display:block; height:100%; width:14%; background:var(--accent); }
+
+/* 주석 마커 */
+.dot {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:17px; height:17px; border-radius:50%; background:var(--accent); color:#fff;
+  font-size:10.5px; font-weight:800; flex:none; line-height:1;
+}
+.dot.abs { position:absolute; top:-8px; right:-7px; box-shadow:0 0 0 2.5px var(--panel); }
+.notes { display:flex; flex-direction:column; gap:9px; margin:0; padding:0; list-style:none; }
+.notes li { display:flex; gap:9px; font-size:13px; }
+.notes .dot { margin-top:2px; }
+.notes b { font-weight:700; }
+.notes .why { color:var(--sub); font-size:12.5px; display:block; margin-top:1px; }
+.wf-cap { font-size:12px; color:var(--sub); margin-top:8px; text-align:center; }
+
+/* 규칙 카드 */
+.rules { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+.rule { background:var(--panel); border:1.5px solid var(--line); border-radius:12px; padding:13px 15px; }
+.rule b { display:block; font-size:13.5px; margin-bottom:3px; }
+.rule b::before { content:"— "; color:var(--accent); }
+.rule p { margin:0; font-size:12.5px; color:var(--sub); }
+kbd {
+  background:var(--wire-bg); border:1px solid var(--line); border-radius:4px;
+  padding:0 5px; font-size:11px; font-family:ui-monospace,Consolas,monospace;
+}
+@media (max-width:720px) {
+  .duo, .solo, .rules, .branches { grid-template-columns:1fr; }
+  .arrow { display:none; }
+  .step { min-width:calc(50% - 6px); }
+}
+</style>
+<main>
+  <p class="eyebrow">KOTE 뉴스 헤드라인 감정 라벨링 플랫폼</p>
+  <h1>화면 흐름 와이어프레임</h1>
+  <p class="lede">32만 건 뉴스 헤드라인에서 층화 샘플링한 <b>1,000건</b>을 작업자가 KOTE 44개 감정으로 멀티라벨 라벨링하는 웹앱입니다.
+  초기에는 <b>Sample</b> 작업자 1명만 만들고, 이후 작업자는 온보딩 화면에서 추가합니다.</p>
+
+  <h2>전체 흐름</h2>
+  <p class="h2-sub">한 건 라벨링의 기본 루프는 <b>③→④→⑤</b> 3단계이며, 저장이 서버에서 확인된 후에만 다음 건으로 넘어갑니다.</p>
+  <div class="flow">
+    <div class="step"><div class="step-no">①</div><div class="step-t">접속·작업자 선택</div><div class="step-d">Sample 선택 또는 새 작업자 추가</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-no">②</div><div class="step-t">내 큐 로드</div><div class="step-d">작업자별 1,000건 배정, 제시 순서 셔플</div></div>
+    <div class="arrow">→</div>
+    <div class="step hot"><div class="step-no">③</div><div class="step-t">헤드라인 판독</div><div class="step-d">기사 1건 제시 + 언론사·일시</div></div>
+    <div class="arrow">→</div>
+    <div class="step hot"><div class="step-no">④</div><div class="step-t">감정 선택</div><div class="step-d">44개 칩 토글 (복수 선택)</div></div>
+    <div class="arrow">→</div>
+    <div class="step hot"><div class="step-no">⑤</div><div class="step-t">저장 후 다음</div><div class="step-d">서버 저장 성공 확인 → 자동 이동</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-no">⑥</div><div class="step-t">완료</div><div class="step-d">1,000건 소진 시 종료, 지난 건 재수정 가능</div></div>
+  </div>
+  <div class="branches">
+    <div class="branch"><b>분기 A — 감정이 없다고 판단</b>라벨 0개로 저장 시도 → 확인 모달 → ‘없음’ 라벨로 기록</div>
+    <div class="branch"><b>분기 B — 판정 불가</b>스킵 버튼 → 사유 선택(판단 불가·뉴스 아님 등) 필수 → 다음 건</div>
+    <div class="branch"><b>분기 C — 저장 실패</b>에러 표시 + 재시도 버튼. 성공 전에는 이동하지 않음 → 유실 0</div>
+  </div>
+  <div class="loopback">↩ <b>이전/다음 이동(←/→)</b>으로 언제든 지난 건에 돌아가 수정 가능 — 재저장은 덮어쓰기(upsert)라 작업자당 최종 판정 1개만 남음</div>
+
+  <h2>화면 1 · 온보딩</h2>
+  <p class="h2-sub">로그인 없이 <b>Sample을 선택하거나 새 작업자를 추가</b>해서 시작합니다. 새 작업자는 생성 즉시 전체 기사 큐가 자동 배정됩니다.</p>
+  <div class="duo">
+    <div>
+      <div class="wf">
+        <div class="wf-head"><i></i><i></i><i></i><span>/ — 작업자 선택</span></div>
+        <div class="wf-body">
+          <div style="text-align:center; padding:4px 0 2px;"><div class="wline w60" style="margin:0 auto;"></div></div>
+          <div class="wbtn" style="position:relative;">Sample<span class="dot abs">1</span></div>
+          <div class="wbar" style="position:relative; gap:6px;">
+            <div class="wbox" style="flex:1; padding:7px 9px; text-align:left; font-size:12px; color:var(--sub);">새 작업자 이름</div>
+            <div class="wbtn primary" style="width:64px; padding:7px 8px;">추가</div>
+            <span class="dot abs">2</span>
+          </div>
+          <div class="wbox ghost" style="position:relative; padding:7px; text-align:center; font-size:12px; color:var(--accent);">
+            라벨링 대상 데이터 목록 보기 →<span class="dot abs">3</span>
+          </div>
+        </div>
+      </div>
+      <p class="wf-cap">작업자 선택 화면</p>
+    </div>
+    <div>
+      <div class="wf">
+        <div class="wf-head"><i></i><i></i><i></i><span>데이터 목록</span></div>
+        <div class="wf-body" style="gap:7px;">
+          <div class="wbar">
+            <div class="wbox" style="flex:1; padding:5px 9px;"><span class="wlabel">검색</span></div>
+            <div class="wchips" style="position:relative;">
+              <span class="wchip sel">전체</span><span class="wchip">A</span><span class="wchip">B</span><span class="wchip">C</span>
+              <span class="dot abs">4</span>
+            </div>
+          </div>
+          <div class="wbox" style="padding:8px 10px; display:flex; flex-direction:column; gap:7px;">
+            <div class="wbar"><div class="wline w80"></div><span class="wchip">A</span></div>
+            <div class="wbar"><div class="wline w60"></div><span class="wchip">B</span></div>
+            <div class="wbar"><div class="wline w80"></div><span class="wchip">C</span></div>
+            <div class="wbar"><div class="wline w40"></div><span class="wchip">A</span></div>
+            <div class="wlabel" style="text-align:center;">… 1,000건</div>
+          </div>
+        </div>
+      </div>
+      <p class="wf-cap">라벨링 대상 목록 (열람 전용)</p>
+    </div>
+  </div>
+  <ul class="notes" style="margin-top:14px;">
+    <li><span class="dot">1</span><span><b>Sample로 즉시 시작 가능.</b><span class="why">초기 CSV 업로드 시 기본 작업자는 Sample 한 명만 생성. 선택은 브라우저에 저장되어 재방문 시 이어서 작업.</span></span></li>
+    <li><span class="dot">2</span><span><b>새 작업자 추가.</b><span class="why">이름을 입력하면 작업자 문서와 1,000건 배정 큐가 자동 생성. 생성한 브라우저가 해당 이름을 소유.</span></span></li>
+    <li><span class="dot">3</span><span><b>라벨링 전 데이터 전수 열람.</b><span class="why">무엇을 라벨링하는지 시작 전에 확인 — 검색과 버킷 필터 제공.</span></span></li>
+    <li><span class="dot">4</span><span><b>버킷 배지로 선정 근거 표시.</b><span class="why">A=예측 감정별 쿼터 · B=순수 랜덤 · C=모델 저신뢰. 모델의 예측 라벨 자체는 편향 방지를 위해 비공개.</span></span></li>
+  </ul>
+
+  <h2>화면 2 · 라벨링 메인 (핵심 화면)</h2>
+  <p class="h2-sub">위→아래가 곧 작업 순서입니다: <b>진행 확인 → 판독 → 선택 → 저장</b>. 마우스 없이 키보드만으로도 진행됩니다.</p>
+  <div class="solo">
+    <div>
+      <div class="wf">
+        <div class="wf-head"><i></i><i></i><i></i><span>라벨링 — Sample</span></div>
+        <div class="wf-body" style="gap:9px;">
+          <div class="wbar" style="position:relative;">
+            <span class="wlabel" style="white-space:nowrap;">내 진행 <b style="color:var(--ink);">137 / 1000</b></span>
+            <div class="wprog"><i></i></div>
+            <span class="dot">1</span>
+          </div>
+          <div class="wbox" style="padding:10px 12px; display:flex; flex-direction:column; gap:7px;">
+            <div class="wbar" style="position:relative;">
+              <div class="wline w80" style="height:14px;"></div><span class="dot">2</span>
+            </div>
+            <div class="wline w40"></div>
+            <div class="wbar" style="border-top:1px dashed var(--line); padding-top:7px; position:relative;">
+              <div class="wchips"><span class="wchip sel">불안/걱정 ✕</span><span class="wchip sel">안타까움/실망 ✕</span></div>
+              <span class="dot">3</span>
+            </div>
+          </div>
+          <div class="wbox" style="padding:5px 9px; position:relative;"><span class="wlabel">라벨 검색 (<kbd>/</kbd>)</span><span class="dot abs">4</span></div>
+          <div class="wbox" style="padding:8px 10px; position:relative;">
+            <div class="g-pos"><div class="gtitle"><span class="gdot"></span>긍정 14</div>
+              <div class="wchips"><span class="wchip">감동/감탄</span><span class="wchip">고마움</span><span class="wchip">기대감</span><span class="wchip">기쁨</span><span class="wchip more">+10</span></div>
+            </div>
+            <div class="g-neg" style="margin-top:8px;"><div class="gtitle"><span class="gdot"></span>부정 23</div>
+              <div class="wchips"><span class="wchip">공포/무서움</span><span class="wchip sel">불안/걱정</span><span class="wchip sel">안타까움/실망</span><span class="wchip">짜증</span><span class="wchip more">+19</span></div>
+            </div>
+            <div class="g-neu" style="margin-top:8px;"><div class="gtitle"><span class="gdot"></span>중립·기타 7</div>
+              <div class="wchips"><span class="wchip">놀람</span><span class="wchip">비장함</span><span class="wchip">없음</span><span class="wchip more">+4</span></div>
+            </div>
+            <span class="dot abs">5</span>
+          </div>
+          <div class="wbar">
+            <div class="wbtn" style="position:relative;">← 이전<span class="dot abs">8</span></div>
+            <div class="wbtn" style="position:relative;">스킵<span class="dot abs">7</span></div>
+            <div class="wbtn primary" style="flex:1; position:relative;">저장 후 다음 ⏎<span class="dot abs">6</span></div>
+            <div class="wbtn">다음 →</div>
+          </div>
+        </div>
+      </div>
+      <p class="wf-cap">단일 화면에서 판독·선택·저장이 모두 완결</p>
+    </div>
+    <ul class="notes">
+      <li><span class="dot">1</span><span><b>진행률 상시 표시.</b><span class="why">137/1000 + 스킵 수 분리 표기.</span></span></li>
+      <li><span class="dot">2</span><span><b>헤드라인 크게, 메타(언론사·일시)는 작게.</b><span class="why">판독 대상에 시선 집중.</span></span></li>
+      <li><span class="dot">3</span><span><b>현재 선택 요약.</b><span class="why">44개 중 무엇을 눌렀는지 한눈에, ✕로 즉시 해제. 미저장 편집은 '미저장 변경' 배지로 구분.</span></span></li>
+      <li><span class="dot">4</span><span><b>라벨 검색.</b><span class="why"><kbd>/</kbd> 키 → 타이핑 즉시 필터.</span></span></li>
+      <li><span class="dot">5</span><span><b>44개 감정 칩 — 긍정/부정/중립 3그룹, 그룹 내 가나다순 고정.</b><span class="why">모델 예측 기반 정렬·추천은 기본 비활성: anchoring bias로 gold set이 오염되는 것을 방지.</span></span></li>
+      <li><span class="dot">6</span><span><b>저장 후 다음 (<kbd>Enter</kbd>).</b><span class="why">서버 저장 성공을 확인한 뒤에만 다음 건으로 이동. 실패 시 재시도 — 데이터 유실 원천 차단.</span></span></li>
+      <li><span class="dot">7</span><span><b>스킵은 사유 필수.</b><span class="why">'판단 불가'와 '감정 없음'을 데이터에서 구분.</span></span></li>
+      <li><span class="dot">8</span><span><b>이전/다음 (<kbd>←</kbd>/<kbd>→</kbd>).</b><span class="why">지난 건 재수정 허용, 덮어쓰기 저장.</span></span></li>
+    </ul>
+  </div>
+
+  <h2>화면 3 · 확인 모달 2종</h2>
+  <p class="h2-sub">모호한 케이스 두 가지를 명시적 확인으로 처리해 <b>'무응답'과 '감정 없음'과 '판정 불가'를 구분</b>합니다.</p>
+  <div class="duo">
+    <div>
+      <div class="wf">
+        <div class="wf-head"><i></i><i></i><i></i><span>라벨 0개로 저장 시</span></div>
+        <div class="wf-body">
+          <div style="font-size:13px; font-weight:700;">감정 없음으로 저장할까요?</div>
+          <div class="wlabel">확인 시 ‘없음’ 라벨로 기록됩니다.</div>
+          <div class="wbar"><div class="wbtn" style="flex:1;">취소</div><div class="wbtn primary" style="flex:2;">감정 없음으로 저장 ⏎</div></div>
+        </div>
+      </div>
+      <p class="wf-cap">빈 선택 확인 — ‘없음’도 명시적 판정으로 기록</p>
+    </div>
+    <div>
+      <div class="wf">
+        <div class="wf-head"><i></i><i></i><i></i><span>스킵 버튼 클릭 시</span></div>
+        <div class="wf-body">
+          <div style="font-size:13px; font-weight:700;">이 건을 스킵할까요?</div>
+          <div class="wchips" style="flex-direction:column; align-items:stretch;">
+            <span class="wchip">○ 판단 불가</span>
+            <span class="wchip sel">● 뉴스 아님</span>
+            <span class="wchip">○ 텍스트 깨짐/불완전</span>
+            <span class="wchip">○ 기타</span>
+          </div>
+          <div class="wbar"><div class="wbtn" style="flex:1;">취소</div><div class="wbtn primary" style="flex:1;">스킵 ⏎</div></div>
+        </div>
+      </div>
+      <p class="wf-cap">스킵 사유 — 라벨 불가 원인을 데이터화</p>
+    </div>
+  </div>
+
+  <h2>데이터 설계 요점</h2>
+  <div class="rules">
+    <div class="rule"><b>작업자별 전체 큐 배정</b><p>초기 Sample 한 명으로 시작하고, 새 작업자 추가 시 현재 1,000건 전체 큐를 자동 생성. 필요 시 IAA용 중복 라벨링으로 확장.</p></div>
+    <div class="rule"><b>제시 순서 작업자별 셔플</b><p>작업자마다 큐 순서를 분리해 같은 기사라도 서로 다른 작업 시점에 보도록 설계.</p></div>
+    <div class="rule"><b>건별 즉시 저장 (upsert)</b><p>매 건 서버 확인 후 이동. 수정 시 덮어쓰기라 라벨러당 최종 판정이 정확히 1개. annotator·timestamp 기록.</p></div>
+    <div class="rule"><b>모델 개입 차단 (기본값)</b><p>모델 추천·예측순 정렬은 config로만 활성화. 사람의 독립 판정을 확보해 평가용 gold set 오염 방지.</p></div>
+  </div>
+</main>

@@ -1,0 +1,122 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function validLabels() {
+      return [
+        "불평/불만", "환영/호의", "감동/감탄", "지긋지긋", "고마움",
+        "슬픔", "화남/분노", "존경", "기대감", "우쭐댐/무시함",
+        "안타까움/실망", "비장함", "의심/불신", "뿌듯함", "편안/쾌적",
+        "신기함/관심", "아껴주는", "부끄러움", "공포/무서움", "절망",
+        "한심함", "역겨움/징그러움", "짜증", "어이없음", "없음",
+        "패배/자기혐오", "귀찮음", "힘듦/지침", "즐거움/신남", "깨달음",
+        "죄책감", "증오/혐오", "흐뭇함(귀여움/예쁨)", "당황/난처", "경악",
+        "부담/안_내킴", "서러움", "재미없음", "불쌍함/연민", "놀람",
+        "행복", "불안/걱정", "기쁨", "안심/신뢰"
+      ];
+    }
+
+    function validSkipReasons() {
+      return ["판단 불가", "뉴스 아님", "텍스트 깨짐/불완전", "기타"];
+    }
+
+    function ownsAnnotator(annotatorId) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/annotatorAccess/$(annotatorId))
+        && get(/databases/$(database)/documents/annotatorAccess/$(annotatorId)).data.uid == request.auth.uid;
+    }
+
+    function validAnnotationShape(data, annotationId) {
+      return data.keys().hasOnly([
+          "assignment_id", "article_id", "annotator_id", "labels", "is_skipped",
+          "skip_reason", "created_at", "updated_at"
+        ])
+        && data.assignment_id == annotationId
+        && data.article_id is int
+        && data.annotator_id is string
+        && data.labels is list
+        && data.labels.hasOnly(validLabels())
+        && data.is_skipped is bool
+        && (data.skip_reason == null || data.skip_reason in validSkipReasons())
+        && exists(/databases/$(database)/documents/assignments/$(annotationId))
+        && get(/databases/$(database)/documents/assignments/$(annotationId)).data.annotator_id == data.annotator_id;
+    }
+
+    function validDoneAnnotation(data) {
+      return data.is_skipped == true
+        || (
+          data.labels.size() > 0
+          && (
+            !("없음" in data.labels)
+            || data.labels == ["없음"]
+          )
+        );
+    }
+
+    match /annotators/{annotatorId} {
+      allow read: if signedIn();
+      allow create: if ownsAnnotator(annotatorId)
+        && request.resource.data.keys().hasOnly(["annotator_id", "name", "created_at"])
+        && request.resource.data.annotator_id == annotatorId
+        && request.resource.data.name == annotatorId
+        && request.resource.data.created_at == request.time
+        && annotatorId.size() > 0
+        && annotatorId.size() <= 40;
+      allow update, delete: if false;
+    }
+
+    match /articles/{articleId} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    match /annotatorAccess/{annotatorId} {
+      allow get: if signedIn();
+      allow list: if false;
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(["annotator_id", "uid", "claimed_at"])
+        && request.resource.data.annotator_id == annotatorId
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.claimed_at == request.time;
+      allow update, delete: if false;
+    }
+
+    match /assignments/{assignmentId} {
+      allow read: if ownsAnnotator(resource.data.annotator_id);
+      allow create: if ownsAnnotator(request.resource.data.annotator_id)
+        && request.resource.data.keys().hasOnly(["assignment_id", "article_id", "annotator_id", "position", "status"])
+        && request.resource.data.assignment_id == assignmentId
+        && request.resource.data.article_id is int
+        && request.resource.data.position is int
+        && request.resource.data.position >= 0
+        && request.resource.data.status == "pending";
+      allow update: if ownsAnnotator(resource.data.annotator_id)
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(["status"])
+        && request.resource.data.status in ["pending", "done", "skipped"];
+      allow delete: if false;
+    }
+
+    match /annotations/{annotationId} {
+      allow read: if ownsAnnotator(resource.data.annotator_id);
+      allow create: if ownsAnnotator(request.resource.data.annotator_id)
+        && validAnnotationShape(request.resource.data, annotationId)
+        && validDoneAnnotation(request.resource.data)
+        && request.resource.data.created_at == request.time
+        && request.resource.data.updated_at == request.time;
+      allow update: if ownsAnnotator(resource.data.annotator_id)
+        && request.resource.data.annotator_id == resource.data.annotator_id
+        && validAnnotationShape(request.resource.data, annotationId)
+        && validDoneAnnotation(request.resource.data)
+        && request.resource.data.created_at == resource.data.created_at
+        && request.resource.data.updated_at == request.time;
+      allow delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
