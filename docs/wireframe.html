@@ -4,25 +4,25 @@
   --bg:#fafbfc; --panel:#fff; --ink:#26303e; --sub:#6b7686;
   --line:#d7dde6; --wire:#aab4c2; --wire-bg:#f2f5f8;
   --accent:#1d4ed8; --accent-bg:#e8eefc;
-  --pos:#3b6fd4; --neg:#c4514a; --neu:#7c8797;
+  --pos:#3b6fd4; --neg:#c4514a; --neu:#7c8797; --warn:#a16207;
 }
 @media (prefers-color-scheme: dark) { :root {
   --bg:#12161d; --panel:#1a2029; --ink:#e6eaf1; --sub:#94a0b0;
   --line:#2b3441; --wire:#4d5a6b; --wire-bg:#212936;
   --accent:#7da4f5; --accent-bg:#1f2c4a;
-  --pos:#7da4f5; --neg:#e08b85; --neu:#8b97a8;
+  --pos:#7da4f5; --neg:#e08b85; --neu:#8b97a8; --warn:#e0b45c;
 }}
 :root[data-theme="dark"] {
   --bg:#12161d; --panel:#1a2029; --ink:#e6eaf1; --sub:#94a0b0;
   --line:#2b3441; --wire:#4d5a6b; --wire-bg:#212936;
   --accent:#7da4f5; --accent-bg:#1f2c4a;
-  --pos:#7da4f5; --neg:#e08b85; --neu:#8b97a8;
+  --pos:#7da4f5; --neg:#e08b85; --neu:#8b97a8; --warn:#e0b45c;
 }
 :root[data-theme="light"] {
   --bg:#fafbfc; --panel:#fff; --ink:#26303e; --sub:#6b7686;
   --line:#d7dde6; --wire:#aab4c2; --wire-bg:#f2f5f8;
   --accent:#1d4ed8; --accent-bg:#e8eefc;
-  --pos:#3b6fd4; --neg:#c4514a; --neu:#7c8797;
+  --pos:#3b6fd4; --neg:#c4514a; --neu:#7c8797; --warn:#a16207;
 }
 * { box-sizing:border-box; }
 body {
@@ -40,6 +40,8 @@ h2 { font-size:13px; font-weight:700; letter-spacing:.12em; color:var(--sub); te
      margin:52px 0 6px; }
 .h2-sub { font-size:13.5px; color:var(--sub); margin:0 0 18px; max-width:70ch; }
 .h2-sub b { color:var(--ink); }
+h3 { font-size:13.5px; font-weight:750; margin:24px 0 10px; }
+h3 span { color:var(--sub); font-weight:500; }
 
 /* ── 플로우 다이어그램 ── */
 .flow { display:flex; flex-wrap:wrap; align-items:stretch; gap:6px; }
@@ -58,7 +60,7 @@ h2 { font-size:13px; font-weight:700; letter-spacing:.12em; color:var(--sub); te
   display:flex; gap:8px; flex-wrap:wrap;
 }
 .loopback b { color:var(--ink); }
-.branches { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:8px; }
+.branches { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-top:8px; }
 .branch {
   border:1.5px dashed var(--wire); border-radius:10px; padding:9px 12px;
   font-size:12px; color:var(--sub); background:transparent;
@@ -67,6 +69,7 @@ h2 { font-size:13px; font-weight:700; letter-spacing:.12em; color:var(--sub); te
 
 /* ── 와이어프레임 공통 ── */
 .duo { display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start; }
+.trio { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; align-items:start; }
 .solo { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:24px; align-items:start; }
 .wf {
   background:var(--panel); border:1.5px solid var(--wire); border-radius:12px;
@@ -96,6 +99,7 @@ h2 { font-size:13px; font-weight:700; letter-spacing:.12em; color:var(--sub); te
 }
 .wchip.sel { background:var(--ink); border-color:var(--ink); color:var(--bg); font-weight:700; }
 .wchip.more { border-style:dashed; }
+.wchip.danger { color:var(--neg); border-color:color-mix(in srgb, var(--neg) 50%, transparent); }
 .g-pos .wchip:not(.sel) { border-color:color-mix(in srgb, var(--pos) 45%, transparent); color:var(--pos); }
 .g-neg .wchip:not(.sel) { border-color:color-mix(in srgb, var(--neg) 45%, transparent); color:var(--neg); }
 .g-neu .wchip:not(.sel) { border-color:color-mix(in srgb, var(--neu) 55%, transparent); color:var(--neu); }
@@ -122,18 +126,29 @@ h2 { font-size:13px; font-weight:700; letter-spacing:.12em; color:var(--sub); te
 .notes .why { color:var(--sub); font-size:12.5px; display:block; margin-top:1px; }
 .wf-cap { font-size:12px; color:var(--sub); margin-top:8px; text-align:center; }
 
-/* 규칙 카드 */
+/* 규칙·시나리오 카드 */
 .rules { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
 .rule { background:var(--panel); border:1.5px solid var(--line); border-radius:12px; padding:13px 15px; }
 .rule b { display:block; font-size:13.5px; margin-bottom:3px; }
 .rule b::before { content:"— "; color:var(--accent); }
 .rule p { margin:0; font-size:12.5px; color:var(--sub); }
+.rule p b { display:inline; font-size:inherit; margin:0; color:var(--ink); }
+.rule p b::before { content:none; }
+.badge {
+  display:inline-block; font-size:10px; font-weight:800; letter-spacing:.04em;
+  padding:1.5px 8px; border-radius:999px; margin-left:7px; vertical-align:1.5px; white-space:nowrap;
+}
+.badge.auto  { color:var(--accent); background:var(--accent-bg); }
+.badge.block { color:var(--neg);  background:color-mix(in srgb, var(--neg) 13%, transparent); }
+.badge.keep  { color:var(--neu);  background:color-mix(in srgb, var(--neu) 16%, transparent); }
+.badge.admin { color:var(--warn); background:color-mix(in srgb, var(--warn) 15%, transparent); }
+.scen > b::before { content:none; }
 kbd {
   background:var(--wire-bg); border:1px solid var(--line); border-radius:4px;
   padding:0 5px; font-size:11px; font-family:ui-monospace,Consolas,monospace;
 }
 @media (max-width:720px) {
-  .duo, .solo, .rules, .branches { grid-template-columns:1fr; }
+  .duo, .trio, .solo, .rules, .branches { grid-template-columns:1fr; }
   .arrow { display:none; }
   .step { min-width:calc(50% - 6px); }
 }
@@ -142,32 +157,34 @@ kbd {
   <p class="eyebrow">KOTE 뉴스 헤드라인 감정 라벨링 플랫폼</p>
   <h1>화면 흐름 와이어프레임</h1>
   <p class="lede">32만 건 뉴스 헤드라인에서 층화 샘플링한 <b>1,000건</b>을 작업자가 KOTE 44개 감정으로 멀티라벨 라벨링하는 웹앱입니다.
-  초기에는 <b>Sample</b> 작업자 1명만 만들고, 이후 작업자는 온보딩 화면에서 추가합니다.</p>
+  화면은 서버 없이 정적 페이지로 배포되고(Vercel), 라벨은 브라우저에서 <b>클라우드 데이터베이스(Firestore)에 직접 기록</b>됩니다.
+  로그인·비밀번호 없이 <b>이름 선택 = 브라우저 잠금</b> 방식으로 본인 확인을 대신합니다.</p>
 
   <h2>전체 흐름</h2>
-  <p class="h2-sub">한 건 라벨링의 기본 루프는 <b>③→④→⑤</b> 3단계이며, 저장이 서버에서 확인된 후에만 다음 건으로 넘어갑니다.</p>
+  <p class="h2-sub">한 건 라벨링의 기본 루프는 <b>③→④→⑤</b> 3단계이며, 저장이 데이터베이스에서 확인된 후에만 다음 건으로 넘어갑니다.</p>
   <div class="flow">
-    <div class="step"><div class="step-no">①</div><div class="step-t">접속·작업자 선택</div><div class="step-d">Sample 선택 또는 새 작업자 추가</div></div>
+    <div class="step"><div class="step-no">①</div><div class="step-t">접속·작업자 선택</div><div class="step-d">이름 선택·추가 — 이 브라우저가 그 이름을 잠금</div></div>
     <div class="arrow">→</div>
-    <div class="step"><div class="step-no">②</div><div class="step-t">내 큐 로드</div><div class="step-d">작업자별 1,000건 배정, 제시 순서 셔플</div></div>
+    <div class="step"><div class="step-no">②</div><div class="step-t">내 큐 로드</div><div class="step-d">1,000건 배정, 순서는 작업자별 셔플 — 첫 미완료 건으로 자동 이동</div></div>
     <div class="arrow">→</div>
     <div class="step hot"><div class="step-no">③</div><div class="step-t">헤드라인 판독</div><div class="step-d">기사 1건 제시 + 언론사·일시</div></div>
     <div class="arrow">→</div>
     <div class="step hot"><div class="step-no">④</div><div class="step-t">감정 선택</div><div class="step-d">44개 칩 토글 (복수 선택)</div></div>
     <div class="arrow">→</div>
-    <div class="step hot"><div class="step-no">⑤</div><div class="step-t">저장 후 다음</div><div class="step-d">서버 저장 성공 확인 → 자동 이동</div></div>
+    <div class="step hot"><div class="step-no">⑤</div><div class="step-t">저장 후 다음</div><div class="step-d">저장 성공 확인 → 자동 이동</div></div>
     <div class="arrow">→</div>
-    <div class="step"><div class="step-no">⑥</div><div class="step-t">완료</div><div class="step-d">1,000건 소진 시 종료, 지난 건 재수정 가능</div></div>
+    <div class="step"><div class="step-no">⑥</div><div class="step-t">완료·종료</div><div class="step-d">1,000건 소진 시 종료 — '세션 종료'로 잠금 해제</div></div>
   </div>
   <div class="branches">
     <div class="branch"><b>분기 A — 감정이 없다고 판단</b>라벨 0개로 저장 시도 → 확인 모달 → ‘없음’ 라벨로 기록</div>
     <div class="branch"><b>분기 B — 판정 불가</b>스킵 버튼 → 사유 선택(판단 불가·뉴스 아님 등) 필수 → 다음 건</div>
     <div class="branch"><b>분기 C — 저장 실패</b>에러 표시 + 재시도 버튼. 성공 전에는 이동하지 않음 → 유실 0</div>
+    <div class="branch"><b>분기 D — 접속 충돌</b>다른 브라우저가 사용 중인 이름 → 접속 차단 (아래 ‘접속·종료 예외 로직’ 참조)</div>
   </div>
   <div class="loopback">↩ <b>이전/다음 이동(←/→)</b>으로 언제든 지난 건에 돌아가 수정 가능 — 재저장은 덮어쓰기(upsert)라 작업자당 최종 판정 1개만 남음</div>
 
   <h2>화면 1 · 온보딩</h2>
-  <p class="h2-sub">로그인 없이 <b>Sample을 선택하거나 새 작업자를 추가</b>해서 시작합니다. 새 작업자는 생성 즉시 전체 기사 큐가 자동 배정됩니다.</p>
+  <p class="h2-sub">로그인 없이 <b>이름을 선택하거나 새 작업자를 추가</b>해서 시작합니다. 새 작업자는 생성 즉시 전체 기사 큐가 자동 배정됩니다.</p>
   <div class="duo">
     <div>
       <div class="wf">
@@ -211,10 +228,10 @@ kbd {
     </div>
   </div>
   <ul class="notes" style="margin-top:14px;">
-    <li><span class="dot">1</span><span><b>Sample로 즉시 시작 가능.</b><span class="why">초기 CSV 업로드 시 기본 작업자는 Sample 한 명만 생성. 선택은 브라우저에 저장되어 재방문 시 이어서 작업.</span></span></li>
-    <li><span class="dot">2</span><span><b>새 작업자 추가.</b><span class="why">이름을 입력하면 작업자 문서와 1,000건 배정 큐가 자동 생성. 생성한 브라우저가 해당 이름을 소유.</span></span></li>
+    <li><span class="dot">1</span><span><b>이름 선택 = 세션 시작 + 브라우저 잠금.</b><span class="why">선택한 순간 이 브라우저가 그 이름을 독점(잠금)하고, 선택은 브라우저에 저장되어 재방문 시 바로 이어서 작업. 작업자별 전용 링크(?annotator=이름)도 지원.</span></span></li>
+    <li><span class="dot">2</span><span><b>새 작업자 추가.</b><span class="why">이름을 입력하면 작업자 문서와 1,000건 배정 큐(작업자별 셔플 순서 포함)가 즉시 생성. 생성한 브라우저가 그 이름을 소유.</span></span></li>
     <li><span class="dot">3</span><span><b>라벨링 전 데이터 전수 열람.</b><span class="why">무엇을 라벨링하는지 시작 전에 확인 — 검색과 버킷 필터 제공.</span></span></li>
-    <li><span class="dot">4</span><span><b>버킷 배지로 선정 근거 표시.</b><span class="why">A=예측 감정별 쿼터 · B=순수 랜덤 · C=모델 저신뢰. 모델의 예측 라벨 자체는 편향 방지를 위해 비공개.</span></span></li>
+    <li><span class="dot">4</span><span><b>버킷 배지로 선정 근거 표시.</b><span class="why">A=예측 감정별 할당 · B=완전 무작위 · C=경계 구간(모델 저신뢰). 모델의 예측 라벨 자체는 편향 방지를 위해 비공개.</span></span></li>
   </ul>
 
   <h2>화면 2 · 라벨링 메인 (핵심 화면)</h2>
@@ -229,17 +246,23 @@ kbd {
             <div class="wprog"><i></i></div>
             <span class="dot">1</span>
           </div>
+          <div class="wbar" style="justify-content:flex-end; gap:8px; flex-wrap:wrap;">
+            <span class="wchip" style="position:relative;">변경 사항 2건<span class="dot abs">2</span></span>
+            <span class="wlabel" style="font-weight:700; color:var(--ink);">Sample</span>
+            <span class="wchip">변경</span>
+            <span class="wchip danger" style="position:relative;">세션 종료<span class="dot abs">3</span></span>
+          </div>
           <div class="wbox" style="padding:10px 12px; display:flex; flex-direction:column; gap:7px;">
             <div class="wbar" style="position:relative;">
-              <div class="wline w80" style="height:14px;"></div><span class="dot">2</span>
+              <div class="wline w80" style="height:14px;"></div><span class="dot">4</span>
             </div>
             <div class="wline w40"></div>
             <div class="wbar" style="border-top:1px dashed var(--line); padding-top:7px; position:relative;">
               <div class="wchips"><span class="wchip sel">불안/걱정 ✕</span><span class="wchip sel">안타까움/실망 ✕</span></div>
-              <span class="dot">3</span>
+              <span class="dot">5</span>
             </div>
           </div>
-          <div class="wbox" style="padding:5px 9px; position:relative;"><span class="wlabel">라벨 검색 (<kbd>/</kbd>)</span><span class="dot abs">4</span></div>
+          <div class="wbox" style="padding:5px 9px; position:relative;"><span class="wlabel">라벨 검색 (<kbd>/</kbd>)</span><span class="dot abs">6</span></div>
           <div class="wbox" style="padding:8px 10px; position:relative;">
             <div class="g-pos"><div class="gtitle"><span class="gdot"></span>긍정 14</div>
               <div class="wchips"><span class="wchip">감동/감탄</span><span class="wchip">고마움</span><span class="wchip">기대감</span><span class="wchip">기쁨</span><span class="wchip more">+10</span></div>
@@ -250,12 +273,12 @@ kbd {
             <div class="g-neu" style="margin-top:8px;"><div class="gtitle"><span class="gdot"></span>중립·기타 7</div>
               <div class="wchips"><span class="wchip">놀람</span><span class="wchip">비장함</span><span class="wchip">없음</span><span class="wchip more">+4</span></div>
             </div>
-            <span class="dot abs">5</span>
+            <span class="dot abs">7</span>
           </div>
           <div class="wbar">
-            <div class="wbtn" style="position:relative;">← 이전<span class="dot abs">8</span></div>
-            <div class="wbtn" style="position:relative;">스킵<span class="dot abs">7</span></div>
-            <div class="wbtn primary" style="flex:1; position:relative;">저장 후 다음 ⏎<span class="dot abs">6</span></div>
+            <div class="wbtn" style="position:relative;">← 이전<span class="dot abs">10</span></div>
+            <div class="wbtn" style="position:relative;">스킵<span class="dot abs">9</span></div>
+            <div class="wbtn primary" style="flex:1; position:relative;">저장 후 다음 ⏎<span class="dot abs">8</span></div>
             <div class="wbtn">다음 →</div>
           </div>
         </div>
@@ -264,19 +287,21 @@ kbd {
     </div>
     <ul class="notes">
       <li><span class="dot">1</span><span><b>진행률 상시 표시.</b><span class="why">137/1000 + 스킵 수 분리 표기.</span></span></li>
-      <li><span class="dot">2</span><span><b>헤드라인 크게, 메타(언론사·일시)는 작게.</b><span class="why">판독 대상에 시선 집중.</span></span></li>
-      <li><span class="dot">3</span><span><b>현재 선택 요약.</b><span class="why">44개 중 무엇을 눌렀는지 한눈에, ✕로 즉시 해제. 미저장 편집은 '미저장 변경' 배지로 구분.</span></span></li>
-      <li><span class="dot">4</span><span><b>라벨 검색.</b><span class="why"><kbd>/</kbd> 키 → 타이핑 즉시 필터.</span></span></li>
-      <li><span class="dot">5</span><span><b>44개 감정 칩 — 긍정/부정/중립 3그룹, 그룹 내 가나다순 고정.</b><span class="why">모델 예측 기반 정렬·추천은 기본 비활성: anchoring bias로 gold set이 오염되는 것을 방지.</span></span></li>
-      <li><span class="dot">6</span><span><b>저장 후 다음 (<kbd>Enter</kbd>).</b><span class="why">서버 저장 성공을 확인한 뒤에만 다음 건으로 이동. 실패 시 재시도 — 데이터 유실 원천 차단.</span></span></li>
-      <li><span class="dot">7</span><span><b>스킵은 사유 필수.</b><span class="why">'판단 불가'와 '감정 없음'을 데이터에서 구분.</span></span></li>
-      <li><span class="dot">8</span><span><b>이전/다음 (<kbd>←</kbd>/<kbd>→</kbd>).</b><span class="why">지난 건 재수정 허용, 덮어쓰기 저장.</span></span></li>
+      <li><span class="dot">2</span><span><b>변경 사항 모아보기.</b><span class="why">미저장 변경·저장 후 수정 중인 건의 개수를 상시 표시. 클릭하면 목록 모달(화면 3)이 열리고 해당 건으로 즉시 이동 가능.</span></span></li>
+      <li><span class="dot">3</span><span><b>세션 종료 / 작업자 변경.</b><span class="why">'세션 종료'는 확인 후 이름 잠금을 해제하고 나가기 — 다른 기기로 옮길 때 필수. '변경'은 잠금을 유지한 채 선택 화면으로.</span></span></li>
+      <li><span class="dot">4</span><span><b>헤드라인 크게, 메타(언론사·일시)는 작게.</b><span class="why">판독 대상에 시선 집중.</span></span></li>
+      <li><span class="dot">5</span><span><b>현재 선택 요약.</b><span class="why">44개 중 무엇을 눌렀는지 한눈에, ✕로 즉시 해제. 미저장 편집은 '미저장 변경' 배지로 구분.</span></span></li>
+      <li><span class="dot">6</span><span><b>라벨 검색.</b><span class="why"><kbd>/</kbd> 키 → 타이핑 즉시 필터.</span></span></li>
+      <li><span class="dot">7</span><span><b>44개 감정 칩 — 긍정/부정/중립 3그룹, 그룹 내 가나다순 고정.</b><span class="why">모델 예측 기반 정렬·추천은 기본 비활성: 답을 미리 보여줘 판단이 쏠리는 것(anchoring bias)을 방지.</span></span></li>
+      <li><span class="dot">8</span><span><b>저장 후 다음 (<kbd>Enter</kbd>).</b><span class="why">데이터베이스 저장 성공을 확인한 뒤에만 다음 건으로 이동. 실패 시 재시도 — 데이터 유실 원천 차단.</span></span></li>
+      <li><span class="dot">9</span><span><b>스킵은 사유 필수.</b><span class="why">'판단 불가'와 '감정 없음'을 데이터에서 구분.</span></span></li>
+      <li><span class="dot">10</span><span><b>이전/다음 (<kbd>←</kbd>/<kbd>→</kbd>).</b><span class="why">지난 건 재수정 허용, 덮어쓰기 저장.</span></span></li>
     </ul>
   </div>
 
-  <h2>화면 3 · 확인 모달 2종</h2>
-  <p class="h2-sub">모호한 케이스 두 가지를 명시적 확인으로 처리해 <b>'무응답'과 '감정 없음'과 '판정 불가'를 구분</b>합니다.</p>
-  <div class="duo">
+  <h2>화면 3 · 모달 3종</h2>
+  <p class="h2-sub"><b>'감정 없음'·'판정 불가'·'무응답'을 구분</b>해 기록하고, 미저장 편집은 한곳에서 추적합니다.</p>
+  <div class="trio">
     <div>
       <div class="wf">
         <div class="wf-head"><i></i><i></i><i></i><span>라벨 0개로 저장 시</span></div>
@@ -304,13 +329,77 @@ kbd {
       </div>
       <p class="wf-cap">스킵 사유 — 라벨 불가 원인을 데이터화</p>
     </div>
+    <div>
+      <div class="wf">
+        <div class="wf-head"><i></i><i></i><i></i><span>'변경 사항 N건' 클릭 시</span></div>
+        <div class="wf-body" style="gap:7px;">
+          <div style="font-size:13px; font-weight:700;">변경 사항 2건</div>
+          <div class="wbox" style="padding:7px 9px; display:flex; flex-direction:column; gap:4px;">
+            <span class="wchip" style="align-self:flex-start;">미저장 변경</span>
+            <div class="wline w80"></div>
+            <span class="wlabel">137 / 1000 · 불안/걱정</span>
+          </div>
+          <div class="wbox" style="padding:7px 9px; display:flex; flex-direction:column; gap:4px;">
+            <span class="wchip" style="align-self:flex-start;">저장 후 수정</span>
+            <div class="wline w60"></div>
+            <span class="wlabel">58 / 1000 · 없음</span>
+          </div>
+          <div class="wbar"><div class="wbtn" style="flex:1;">닫기</div></div>
+        </div>
+      </div>
+      <p class="wf-cap">항목 클릭 시 해당 건으로 즉시 이동해 저장 가능</p>
+    </div>
+  </div>
+
+  <h2>접속·종료 예외 로직</h2>
+  <p class="h2-sub">로그인 없이 운영하는 대신, <b>이름을 선택한 브라우저가 그 이름을 '잠금'으로 독점</b>합니다.
+  잠금 소유자 확인과 데이터 접근 제한은 화면이 아니라 <b>데이터베이스 보안 규칙이 서버 측에서 강제</b>하므로 우회할 수 없습니다.</p>
+  <div class="flow">
+    <div class="step"><div class="step-no">잠금 없음</div><div class="step-t">미점유</div><div class="step-d">누구든 이 이름으로 시작 가능</div></div>
+    <div class="arrow">→</div>
+    <div class="step hot"><div class="step-no">이름 선택</div><div class="step-t">잠금 생성</div><div class="step-d">이 브라우저 = 이 이름의 소유자로 기록</div></div>
+    <div class="arrow">→</div>
+    <div class="step hot"><div class="step-no">작업 중</div><div class="step-t">독점 사용</div><div class="step-d">소유 브라우저만 이 이름의 배정·라벨을 읽고 씀</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-no">세션 종료</div><div class="step-t">잠금 해제</div><div class="step-d">이름이 다시 미점유로 — 다른 기기에서 사용 가능</div></div>
+  </div>
+  <div class="loopback">↩ <b>창만 닫으면 잠금은 유지</b> — 같은 브라우저로 다시 열면 그대로 이어하기. 다른 기기로 옮길 때만 '세션 종료'(또는 관리자 해제)가 필요합니다.</div>
+
+  <h3>접속할 때 <span>— 이어하기와 충돌 처리</span></h3>
+  <div class="rules">
+    <div class="rule scen"><b>같은 브라우저로 재접속<span class="badge auto">자동 이어하기</span></b>
+      <p>선택한 이름이 브라우저에 저장되어 있어 선택 화면 없이 바로 내 큐로. 저장·스킵 상태가 그대로 복원되고 <b>첫 미완료 건으로 자동 이동</b>합니다.</p></div>
+    <div class="rule scen"><b>전용 링크로 접속 (?annotator=이름)<span class="badge auto">자동 선택</span></b>
+      <p>작업자별 공유 링크를 열면 이름 선택 단계를 건너뜁니다. 메신저로 링크만 전달하면 작업자가 이름을 잘못 고를 여지가 없습니다.</p></div>
+    <div class="rule scen"><b>다른 브라우저·기기에서 같은 이름으로 접속<span class="badge block">차단</span></b>
+      <p>"이미 다른 브라우저에서 사용 중입니다" 안내 후 선택 화면으로 복귀. 같은 이름의 판정이 두 곳에서 동시에 섞여 기록되는 것을 막기 위한 규칙입니다.</p></div>
+    <div class="rule scen"><b>다른 작업자의 데이터에 접근 시도<span class="badge block">차단</span></b>
+      <p>잠금 소유 브라우저가 아니면 해당 작업자의 배정·라벨 읽기와 쓰기가 데이터베이스 차원에서 거부됩니다. 화면 조작이나 주소 변경으로 우회할 수 없습니다.</p></div>
+  </div>
+
+  <h3>종료·이탈할 때 <span>— 잠금과 미저장 편집의 행방</span></h3>
+  <div class="rules">
+    <div class="rule scen"><b>'세션 종료' 버튼으로 정상 종료<span class="badge auto">잠금 해제</span></b>
+      <p>확인 후 이름 잠금을 해제하고 이 브라우저의 선택 기억도 지웁니다. 이후 다른 브라우저·기기에서 그 이름으로 이어서 작업할 수 있습니다.</p></div>
+    <div class="rule scen"><b>창·탭을 그냥 닫음<span class="badge keep">잠금 유지</span></b>
+      <p>별도 처리가 없습니다. 같은 브라우저로 다시 열면 그대로 이어하기 — 일상적 중단은 이 방식으로 충분합니다. 단, 그 사이 다른 기기에서는 이 이름을 쓸 수 없습니다.</p></div>
+    <div class="rule scen"><b>'변경' 버튼으로 이름 전환<span class="badge keep">잠금 유지</span></b>
+      <p>잠금은 그대로 두고 작업자 선택 화면으로 돌아갑니다. 이 브라우저가 소유한 다른 이름을 오갈 때 사용하고, 이름을 완전히 놓아줄 때는 '세션 종료'를 씁니다.</p></div>
+    <div class="rule scen"><b>세션 종료 실패 (내 소유가 아닌 잠금)<span class="badge admin">관리자 해제</span></b>
+      <p>다른 브라우저가 만든 잠금은 앱 안에서 해제할 수 없습니다. 안내 후 이 브라우저의 선택 기억만 지우고 선택 화면으로 복귀 — 잠금 자체는 관리자에게 해제를 요청합니다.</p></div>
+    <div class="rule scen"><b>브라우저 데이터 삭제·기기 교체<span class="badge admin">관리자 해제</span></b>
+      <p>새 브라우저로 취급되어 본인 이름의 잠금에 스스로 막힙니다. 관리자가 해제 스크립트(unlock_annotator)로 잠금을 풀어준 뒤 재접속하면 <b>작업 기록은 그대로 이어집니다</b>.</p></div>
+    <div class="rule scen"><b>라벨을 골랐지만 저장 전에 이탈<span class="badge admin">주의</span></b>
+      <p>미저장 편집은 화면 이동에는 유실 없이 유지되고 '변경 사항' 모달로 추적되지만, <b>브라우저를 닫으면 사라집니다</b>. 저장된 라벨은 건별 즉시 기록이라 안전 — 종료 전 '변경 사항 0건'만 확인하면 됩니다.</p></div>
   </div>
 
   <h2>데이터 설계 요점</h2>
   <div class="rules">
+    <div class="rule"><b>서버 없는 구조</b><p>정적 페이지(Vercel) + 클라우드 DB(Firestore) 직결. 별도 서버 운영 없이 배포·유지되고, 저장은 건별로 즉시 클라우드에 기록.</p></div>
+    <div class="rule"><b>규칙 검증을 서버 측에서 강제</b><p>'없음' 단독 선택, 스킵 사유 필수, 44개 라벨 정합성, 잠금 소유자 확인을 데이터베이스 보안 규칙이 재검사 — 화면 우회 저장 불가.</p></div>
     <div class="rule"><b>작업자별 전체 큐 배정</b><p>초기 Sample 한 명으로 시작하고, 새 작업자 추가 시 현재 1,000건 전체 큐를 자동 생성. 필요 시 IAA용 중복 라벨링으로 확장.</p></div>
     <div class="rule"><b>제시 순서 작업자별 셔플</b><p>작업자마다 큐 순서를 분리해 같은 기사라도 서로 다른 작업 시점에 보도록 설계.</p></div>
-    <div class="rule"><b>건별 즉시 저장 (upsert)</b><p>매 건 서버 확인 후 이동. 수정 시 덮어쓰기라 라벨러당 최종 판정이 정확히 1개. annotator·timestamp 기록.</p></div>
-    <div class="rule"><b>모델 개입 차단 (기본값)</b><p>모델 추천·예측순 정렬은 config로만 활성화. 사람의 독립 판정을 확보해 평가용 gold set 오염 방지.</p></div>
+    <div class="rule"><b>건별 즉시 저장 (upsert)</b><p>매 건 저장 확인 후 이동. 수정 시 덮어쓰기라 작업자당 최종 판정이 정확히 1개. 작업자·시각 기록.</p></div>
+    <div class="rule"><b>모델 개입 차단 (기본값)</b><p>모델 추천·예측순 정렬은 설정으로만 활성화. 사람의 독립 판정을 확보해 평가용 gold set 오염 방지.</p></div>
   </div>
 </main>
