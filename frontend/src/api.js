@@ -261,7 +261,6 @@ export async function saveAnnotation(payload) {
     const id = assignmentId(payload.annotator_id, payload.article_id);
     const annotationRef = doc(db, "annotations", id);
     const assignmentRef = doc(db, "assignments", id);
-    const existing = await getDoc(annotationRef);
     const batch = writeBatch(db);
     batch.set(annotationRef, {
       assignment_id: id,
@@ -270,7 +269,7 @@ export async function saveAnnotation(payload) {
       labels,
       is_skipped: !!payload.is_skipped,
       skip_reason: payload.is_skipped ? payload.skip_reason : null,
-      created_at: existing.exists() ? existing.data().created_at : serverTimestamp(),
+      created_at: serverTimestamp(),
       updated_at: serverTimestamp(),
     });
     batch.update(assignmentRef, {

@@ -112,7 +112,7 @@ service cloud.firestore {
         && request.resource.data.annotator_id == resource.data.annotator_id
         && validAnnotationShape(request.resource.data, annotationId)
         && validDoneAnnotation(request.resource.data)
-        && request.resource.data.created_at == resource.data.created_at
+        && request.resource.data.created_at == request.time
         && request.resource.data.updated_at == request.time;
       allow delete: if false;
     }
