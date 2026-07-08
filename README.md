@@ -1,3 +1,5 @@
+| 배포 URL: https://hcai-news-labeling.vercel.app/
+
 # Task 2: 뉴스 헤드라인 감정 라벨링 웹앱
 
 Task 1에서 선정된 헤드라인을 여러 작업자가 KOTE 44개 감정으로 멀티라벨 라벨링하는 웹앱.
