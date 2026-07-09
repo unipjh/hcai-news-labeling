@@ -19,3 +19,4 @@ export const GROUPS = {
 export const LABELS = Object.values(GROUPS).flat();
 export const NONE_LABEL = "없음";
 export const SKIP_REASONS = ["판단 불가", "뉴스 아님", "텍스트 깨짐/불완전", "기타"];
+export const MAX_LABELS = 5;

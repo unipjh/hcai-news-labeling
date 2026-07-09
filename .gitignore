@@ -39,3 +39,9 @@ backend/static/
 Thumbs.db
 .vscode/
 .idea/
+
+# Local emulator test run artifacts (screenshots, downloaded CSVs)
+tools/tests/shots/
+tools/tests/downloads/
+firebase-debug.log
+firestore-debug.log

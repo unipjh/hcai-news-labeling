@@ -3,6 +3,16 @@
 이 개편판은 FastAPI 백엔드 없이 Vite React 앱이 Firestore를 직접 사용한다.
 Vercel에는 `frontend/`만 정적 앱으로 배포하고, CSV 업로드는 로컬 Admin 스크립트로 1회 수행한다.
 
+> **2026-07-09 고도화 반영**: `firestore.rules`가 바뀌었으므로(라벨 최대 5개 서버 검증,
+> 관리자 페이지용 읽기/삭제 권한) 배포 전에 반드시 Rules를 재배포해야 한다.
+>
+> ```bash
+> python tools/deploy_firestore_rules.py --credentials ./service-account.json
+> ```
+>
+> 관리자 비밀번호는 `frontend/src/App.jsx`의 `ADMIN_PASSWORD`(기본 `1234`) —
+> 배포 전 원하는 값으로 바꾼다.
+
 ## 1. Firebase 설정
 
 1. Firebase Console에서 프로젝트를 생성한다.
@@ -46,13 +56,24 @@ python tools/import_csv_to_firestore.py \
 
 ## 4. 작업자 잠금 해제
 
-다른 브라우저/주소에서 만든 작업자 잠금 때문에 접속할 수 없으면 관리자 키로 잠금을 해제한다.
+다른 브라우저/주소에서 만든 작업자 잠금 때문에 접속할 수 없으면
+**앱의 관리자 페이지(첫 화면 하단 링크 → 비밀번호)에서 '잠금 해제'** 버튼을 누르면 된다.
+스크립트로도 가능하다:
 
 ```bash
 python tools/unlock_annotator.py Sample --credentials ./service-account.json
 ```
 
 앱 안에서 정상 종료할 때는 상단의 `세션 종료` 버튼을 사용한다.
+
+## 4.5. 로컬 에뮬레이터 테스트
+
+실데이터를 건드리지 않고 전체 플로우(관리자 삭제 포함)를 테스트할 수 있다. Java 21 필요.
+
+```bash
+npx firebase-tools emulators:start --only firestore,auth --project hcai-news-la
+cd frontend && VITE_FIREBASE_EMULATOR=1 npx vite
+```
 
 ## 4. Vercel 설정
 

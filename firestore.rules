@@ -49,6 +49,7 @@ service cloud.firestore {
       return data.is_skipped == true
         || (
           data.labels.size() > 0
+          && data.labels.size() <= 5
           && (
             !("없음" in data.labels)
             || data.labels == ["없음"]
@@ -66,7 +67,8 @@ service cloud.firestore {
         && annotatorId.size() > 0
         && annotatorId.size() <= 40;
       allow update: if false;
-      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+      // 앱 내 관리자 페이지(비밀번호 게이트)에서 작업자 삭제에 사용
+      allow delete: if signedIn();
     }
 
     match /articles/{articleId} {
@@ -83,11 +85,13 @@ service cloud.firestore {
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.claimed_at == request.time;
       allow update: if false;
-      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+      // 소유 브라우저의 세션 종료 + 관리자 페이지의 잠금 해제 둘 다 허용
+      allow delete: if signedIn();
     }
 
     match /assignments/{assignmentId} {
-      allow read: if ownsAnnotator(resource.data.annotator_id);
+      // 본인 큐 조회 + 관리자 페이지 진행 현황 집계
+      allow read: if signedIn();
       allow create: if ownsAnnotator(request.resource.data.annotator_id)
         && request.resource.data.keys().hasOnly(["assignment_id", "article_id", "annotator_id", "position", "status"])
         && request.resource.data.assignment_id == assignmentId
@@ -98,11 +102,13 @@ service cloud.firestore {
       allow update: if ownsAnnotator(resource.data.annotator_id)
         && request.resource.data.diff(resource.data).changedKeys().hasOnly(["status"])
         && request.resource.data.status in ["pending", "done", "skipped"];
-      allow delete: if false;
+      // 관리자 페이지의 작업자 삭제에 사용
+      allow delete: if signedIn();
     }
 
     match /annotations/{annotationId} {
-      allow read: if ownsAnnotator(resource.data.annotator_id);
+      // 본인 결과 조회 + 관리자 페이지 CSV 내보내기
+      allow read: if signedIn();
       allow create: if ownsAnnotator(request.resource.data.annotator_id)
         && validAnnotationShape(request.resource.data, annotationId)
         && validDoneAnnotation(request.resource.data)
@@ -114,7 +120,8 @@ service cloud.firestore {
         && validDoneAnnotation(request.resource.data)
         && request.resource.data.created_at == request.time
         && request.resource.data.updated_at == request.time;
-      allow delete: if false;
+      // 관리자 페이지의 작업자 삭제에 사용
+      allow delete: if signedIn();
     }
 
     match /{document=**} {
