@@ -175,6 +175,7 @@ body {
   display: flex; align-items: center; gap: 6px;
 }
 .group-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.group-hint { font-size: 11px; font-weight: 400; color: #94a3b8; margin-left: 2px; }
 .group.pos .group-dot { background: var(--pos); }
 .group.neg .group-dot { background: var(--neg); }
 .group.neu .group-dot { background: var(--neu); }

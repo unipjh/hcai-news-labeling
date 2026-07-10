@@ -179,16 +179,54 @@ export async function createAnnotator(name) {
   }
 }
 
+// 기사 1,000건은 사실상 불변 데이터 → localStorage 캐시로 Firestore 읽기 절감
+// (큐 로드 1회당 읽기 ~2,000건 중 절반이 기사 조회였음 — 무료 쿼터 소진의 주범).
+// 기사 데이터를 마이그레이션 등으로 갱신하면 아래 버전을 올려 캐시를 무효화할 것.
+const ARTICLES_CACHE_KEY = "articles_cache_v2026_07_10a";
+const ARTICLES_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 안전장치: 24시간 후 재조회
+
+function readArticlesCache() {
+  try {
+    const raw = localStorage.getItem(ARTICLES_CACHE_KEY);
+    if (!raw) return null;
+    const { at, articles } = JSON.parse(raw);
+    if (!Array.isArray(articles) || articles.length === 0) return null;
+    if (Date.now() - at > ARTICLES_CACHE_TTL_MS) return null;
+    return articles;
+  } catch {
+    return null;
+  }
+}
+
+function writeArticlesCache(articles) {
+  try {
+    // 구버전 캐시 키 정리
+    for (let i = localStorage.length - 1; i >= 0; i -= 1) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith("articles_cache_") && key !== ARTICLES_CACHE_KEY) {
+        localStorage.removeItem(key);
+      }
+    }
+    localStorage.setItem(ARTICLES_CACHE_KEY, JSON.stringify({ at: Date.now(), articles }));
+  } catch {
+    // 저장 공간 부족 등은 무시 — 캐시는 최적화일 뿐
+  }
+}
+
 export async function getArticles() {
+  const cached = readArticlesCache();
+  if (cached) return cached;
   try {
     await ensureAuth();
     const snap = await getDocs(collection(db, "articles"));
-    return snap.docs
+    const articles = snap.docs
       .map((d) => normalizeArticle(d.id, d.data()))
       .sort((a, b) => {
         const byDate = String(b.published_at).localeCompare(String(a.published_at));
         return byDate || Number(b.article_id) - Number(a.article_id);
       });
+    writeArticlesCache(articles);
+    return articles;
   } catch (error) {
     throw asError(error, "기사 목록을 불러오지 못했습니다.");
   }

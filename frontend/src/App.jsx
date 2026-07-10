@@ -499,7 +499,10 @@ function GuidePanel() {
         <summary>라벨링 가이드</summary>
         <ol className="guide-steps">
           <li><b>이 문장(헤드라인)이 어떤 감정을 표현하고 있는지</b> 아래 감정 칩에서 골라주세요.</li>
-          <li>감정은 <b>최소 1개 ~ 최대 {MAX_LABELS}개</b>까지 고를 수 있어요. 감정이 없다고 판단되면 <b>'없음'</b>을 골라주세요 ('없음'은 단독 선택만 가능).</li>
+          <li>감정은 긍정/부정/중립 구분 없이 <b>전체 합쳐 최소 1개 ~ 최대 {MAX_LABELS}개</b>입니다
+            (카테고리별 {MAX_LABELS}개씩이 아니에요!). 긍정/부정/중립 묶음은 감정을 찾기
+            쉽게 나눈 <b>분류 참고용</b>일 뿐입니다. 감정이 없다고 판단되면 <b>'없음'</b>을 골라주세요
+            ('없음'은 단독 선택만 가능).</li>
           <li className="guide-important"><b>'저장 후 다음' 버튼을 눌러야 저장됩니다.</b> 누르지 않고 넘어가면 저장이 안 되니 꼭 누르고 넘어가 주세요.</li>
           <li>판단이 어렵거나 뉴스가 아니면 <b>스킵</b> 버튼으로 사유를 선택해 넘겨주세요.</li>
           <li>이전/다음(←/→)으로 지난 건을 수정할 수 있어요. 수정한 뒤에도 꼭 '저장 후 다음'을 눌러주세요.</li>
@@ -635,7 +638,7 @@ function Labeling({ meta, annotator, onChangeAnnotator, onEndSession }) {
     } else {
       const withoutNone = selected.filter((l) => l !== noneLabel);
       if (withoutNone.length >= MAX_LABELS) {
-        showHint(`감정은 최대 ${MAX_LABELS}개까지만 선택할 수 있어요. 다른 라벨을 해제한 뒤 선택해 주세요.`);
+        showHint(`긍정/부정/중립 모든 카테고리 합쳐 최대 ${MAX_LABELS}개까지 선택할 수 있어요. 다른 라벨을 해제한 뒤 선택해 주세요.`);
         return;
       }
       next = [...withoutNone, label];
@@ -868,7 +871,8 @@ function Labeling({ meta, annotator, onChangeAnnotator, onEndSession }) {
             const cls = GROUP_CLASS[g.name] || "neu";
             return (
               <section key={g.name} className={`group ${cls}`}>
-                <h3 className="group-title"><span className="group-dot" />{g.name}</h3>
+                <h3 className="group-title"><span className="group-dot" />{g.name}
+                  <span className="group-hint">분류 참고용 · 개수 제한은 전체 기준</span></h3>
                 <div className="chips">
                   {visible.map((l) => (
                     <button key={l} className={`chip ${cls} ${selected.includes(l) ? "on" : ""}`}
