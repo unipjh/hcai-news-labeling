@@ -62,6 +62,13 @@ docs/screenshots/   # UI 초안 스크린샷
 - **로컬 통합 테스트**: `firebase.json` + `VITE_FIREBASE_EMULATOR=1`로 Firestore/Auth
   에뮬레이터에 연결해 실데이터 오염 없이 전체 플로우 테스트 가능 (Java 21 필요).
 
+## 데이터 품질 정제 (2026-07-10)
+
+이상 헤드라인(한자 파손·제목 결합/절단·무의미 단문·사진 캡션) 67건 교체 + 82건 텍스트
+갱신, Firestore 타깃 마이그레이션(`tools/migrate_fixed_articles.py`, 라벨·세션 보존)으로
+동기화 완료. 정본은 task1의 `sampled_for_labeling_v1_fixed.csv`.
+상세: [docs/data-qc-2026-07-10.md](docs/data-qc-2026-07-10.md)
+
 ## 동작 규칙
 
 - **배정 (2026-07-08 확정: k=3 전원 중복)**: 모든 작업자가 동일한 전체 건을 라벨링하되,

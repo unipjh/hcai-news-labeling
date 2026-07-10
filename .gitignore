@@ -45,3 +45,6 @@ tools/tests/shots/
 tools/tests/downloads/
 firebase-debug.log
 firestore-debug.log
+
+# Firestore 마이그레이션 백업 덤프 (기사/배정 데이터)
+firestore_backup_migrate_*.json
