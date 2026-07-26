@@ -182,7 +182,7 @@ export async function createAnnotator(name) {
 // 기사 1,000건은 사실상 불변 데이터 → localStorage 캐시로 Firestore 읽기 절감
 // (큐 로드 1회당 읽기 ~2,000건 중 절반이 기사 조회였음 — 무료 쿼터 소진의 주범).
 // 기사 데이터를 마이그레이션 등으로 갱신하면 아래 버전을 올려 캐시를 무효화할 것.
-const ARTICLES_CACHE_KEY = "articles_cache_v2026_07_10a";
+const ARTICLES_CACHE_KEY = "articles_cache_v2026_07_26_new1000";
 const ARTICLES_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 안전장치: 24시간 후 재조회
 
 function readArticlesCache() {
